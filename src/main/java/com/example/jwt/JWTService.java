@@ -21,5 +21,4 @@ public class JWTService {
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY) // Firma con clave secreta
                 .compact();  // Genera el token
     }
-
 }
