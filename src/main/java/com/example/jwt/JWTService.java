@@ -1,12 +1,13 @@
 package com.example.jwt;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Security;
+import java.security.SignatureException;
 import java.util.Date;
 
 @RestController
@@ -21,4 +22,28 @@ public class JWTService {
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY) // Firma con clave secreta
                 .compact();  // Genera el token
     }
+
+    @PostMapping("/validateToken")
+    public boolean validateToken(@RequestParam String token) {
+        try {
+            Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token);
+            return true; // El token es válido
+        } catch (SecurityException | MalformedJwtException | ExpiredJwtException e) {
+            System.out.println("Token inválido: " + e.getMessage());
+            return false; // El token no es válido
+        }
+    }
+
+    @PostMapping("/TokenUsername")
+    public String getUsernameFromToken(@RequestParam String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject(); // Extrae el nombre de usuario del token
+    }
+
+
 }
